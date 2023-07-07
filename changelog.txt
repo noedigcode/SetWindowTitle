@@ -1,0 +1,14 @@
+Changelog
+=========
+
+[1.0.0] - July 2023
+-------------------
+
+First release.
+
+Added
+
+- Simple interface for detecting and changing window titles
+- Window closes to system tray
+- Escape closes window
+- An icon
