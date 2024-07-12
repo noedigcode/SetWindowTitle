@@ -15,7 +15,7 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
-#define APP_VERSION "1.0.0"
+#define APP_VERSION "1.0.1"
 
 class MainWindow : public QMainWindow
 {
@@ -29,11 +29,16 @@ private slots:
     void on_pushButton_changeTitle_clicked();
     void on_pushButton_unsetTitle_clicked();
     void on_lineEdit_title_returnPressed();
+    void on_lineEdit_title_selectionChanged();
+    void on_lineEdit_title_textChanged(const QString &arg1);
+    void on_toolButton_crop_clicked();
 
 private:
     Ui::MainWindow *ui;
     void closeEvent(QCloseEvent *event);
     bool eventFilter(QObject *watched, QEvent *event);
+
+    QString mSelectedText;
 
     bool wantToQuit = false;
     void quit();

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>517</width>
+    <width>662</width>
     <height>48</height>
    </rect>
   </property>
@@ -51,6 +51,20 @@
            </widget>
           </item>
           <item>
+           <widget class="QToolButton" name="toolButton_crop">
+            <property name="toolTip">
+             <string>Crop title to selected text</string>
+            </property>
+            <property name="text">
+             <string>[ ]</string>
+            </property>
+            <property name="icon">
+             <iconset resource="images/images.qrc">
+              <normaloff>:/setwintitle-crop-selection.png</normaloff>:/setwintitle-crop-selection.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="pushButton_changeTitle">
             <property name="text">
              <string>Change Title</string>
@@ -74,6 +88,8 @@
    </layout>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="images/images.qrc"/>
+ </resources>
  <connections/>
 </ui>

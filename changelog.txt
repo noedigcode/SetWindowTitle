@@ -1,6 +1,14 @@
 Changelog
 =========
 
+[1.0.1] - July 2024
+-------------------
+
+Added
+
+- Crop title to selected text
+
+
 [1.0.0] - July 2023
 -------------------
 

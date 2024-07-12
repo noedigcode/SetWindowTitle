@@ -30,3 +30,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 # Windows API
 LIBS += -luser32
 
+RESOURCES += \
+    images/images.qrc
+

@@ -112,7 +112,12 @@ void MainWindow::on_pushButton_unsetTitle_clicked()
 
 void MainWindow::on_lineEdit_title_returnPressed()
 {
-    on_pushButton_changeTitle_clicked();
+    // If text is selected, use selection. Otherwise, use all text
+    if (!mSelectedText.isEmpty()) {
+        on_toolButton_crop_clicked();
+    } else {
+        on_pushButton_changeTitle_clicked();
+    }
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -167,5 +172,32 @@ void MainWindow::setupTrayIcon()
     trayIcon.setContextMenu(trayMenu);
 
     trayIcon.show();
+}
+
+void MainWindow::on_lineEdit_title_selectionChanged()
+{
+    // Store selected text for when crop button is pressed.
+    // This is necessary as clicking the crop button changes focus away from
+    // the line edit, clearing the selection.
+    QString selected = ui->lineEdit_title->selectedText();
+    if (!selected.isEmpty()) {
+        mSelectedText = selected;
+    }
+}
+
+void MainWindow::on_lineEdit_title_textChanged(const QString& /*arg1*/)
+{
+    // Clear the stored selected text so we don't have confusing lingering
+    // selections from previous windows.
+    mSelectedText.clear();
+}
+
+
+void MainWindow::on_toolButton_crop_clicked()
+{
+    if (mSelectedText.isEmpty()) { return; }
+
+    ui->lineEdit_title->setText(mSelectedText);
+    on_pushButton_changeTitle_clicked();
 }
 
