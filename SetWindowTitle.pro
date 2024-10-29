@@ -12,12 +12,16 @@ include(appicon/appicon.pri)
 
 SOURCES += \
     WindowFunctions.cpp \
+    gidfile.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    settings.cpp
 
 HEADERS += \
     WindowFunctions.h \
-    mainwindow.h
+    gidfile.h \
+    mainwindow.h \
+    settings.h
 
 FORMS += \
     mainwindow.ui

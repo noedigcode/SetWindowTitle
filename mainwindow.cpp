@@ -19,6 +19,17 @@ MainWindow::MainWindow(QWidget *parent)
     timer.start(1000, this);
     setupTrayIcon();
     updateActiveWinWidgets();
+
+    mSettings.load();
+    foreach (Settings::PresetPtr settingPreset, mSettings.presets) {
+        Preset p;
+        p.setting = settingPreset;
+        p.re.setPattern(p.setting->regexPattern);
+        presets.append(p);
+        ui->listWidget_presets->addItem(QString("re(%1) --> %2")
+                                        .arg(p.setting->regexPattern)
+                                        .arg(p.setting->windowTitle));
+    }
 }
 
 MainWindow::~MainWindow()
@@ -33,6 +44,8 @@ void MainWindow::print(const QString& msg)
 
 void MainWindow::timerEvent(QTimerEvent* /*event*/)
 {
+    // Update GUI with currently active window
+
     HWND h = GetForegroundWindow();
 
     if ((h) && (!winDataMap.contains(h)) && (h != (HWND)this->winId())) {
@@ -50,6 +63,38 @@ void MainWindow::timerEvent(QTimerEvent* /*event*/)
     if (!ui->lineEdit_title->hasFocus()) {
         updateActiveWinWidgets();
     }
+
+    // ----------------------------------------------------
+
+    QList<HWND> allWindows = WindowFunctions::getAllWindowHandles();
+    foreach (HWND h, allWindows) {
+        if (!WindowFunctions::isWindow(h)) { continue; }
+        if (winDataMap.contains(h)) {
+            WinData& w = winDataMap[h];
+            if (w.setTitle) {
+                // Title already set, skip
+                continue;
+            }
+        }
+
+        QString title = WindowFunctions::getWindowTitle(h);
+        foreach (const Preset& p, presets) {
+            QRegularExpressionMatch match = p.re.match(title);
+            if (match.hasMatch()) {
+                if (!winDataMap.contains(h)) {
+                    winDataMap.insert(h, WinData());
+                }
+                WinData& w = winDataMap[h];
+                w.setTitle = true;
+                w.title = p.setting->windowTitle;
+                w.preset = p.setting;
+                //WindowFunctions::setWindowTitle(h, w.title);
+                break;
+            }
+        }
+    }
+
+    // ----------------------------------------------------
 
     // Refresh all window titles
     foreach (HWND h, winDataMap.keys()) {
@@ -192,12 +237,70 @@ void MainWindow::on_lineEdit_title_textChanged(const QString& /*arg1*/)
     mSelectedText.clear();
 }
 
-
 void MainWindow::on_toolButton_crop_clicked()
 {
     if (mSelectedText.isEmpty()) { return; }
 
     ui->lineEdit_title->setText(mSelectedText);
     on_pushButton_changeTitle_clicked();
+}
+
+void MainWindow::on_lineEdit_regex_textChanged(const QString& /*arg1*/)
+{
+    QRegularExpression re(ui->lineEdit_regex->text());
+
+    ui->listWidget->clear();
+
+    QList<HWND> windows = WindowFunctions::getAllWindowHandles();
+    foreach (HWND h, windows) {
+        QString title = WindowFunctions::getWindowTitle(h);
+        QRegularExpressionMatch match = re.match(title);
+        if (match.hasMatch()) {
+            ui->listWidget->addItem(title);
+        }
+    }
+}
+
+void MainWindow::on_pushButton_addPreset_clicked()
+{
+    Preset p;
+    p.setting.reset(new Settings::Preset());
+    p.setting->regexPattern = ui->lineEdit_regex->text();
+    p.setting->windowTitle = ui->lineEdit_presetTitle->text();
+
+    p.re.setPattern(p.setting->regexPattern);
+
+    mSettings.presets.append(p.setting);
+    mSettings.save();
+
+    presets.append(p);
+    ui->listWidget_presets->addItem(QString("re(%1) --> %2")
+                                    .arg(p.setting->regexPattern)
+                                    .arg(p.setting->windowTitle));
+}
+
+void MainWindow::on_toolButton_presets_remove_clicked()
+{
+    int index = ui->listWidget_presets->currentRow();
+    if (index < 0) { return; }
+    if (index >= presets.count()) { return; }
+
+    QListWidgetItem* item = ui->listWidget_presets->item(index);
+    if (!item) { return; }
+    delete item;
+
+    Preset& preset = presets[index];
+    mSettings.presets.removeAll(preset.setting);
+
+    presets.removeAt(index);
+
+    // Unset all window titles using this preset
+    foreach (HWND h, winDataMap.keys()) {
+        WinData& win = winDataMap[h];
+        if (win.preset == preset.setting) {
+            win.setTitle = false;
+            win.preset.reset();
+        }
+    }
 }
 
