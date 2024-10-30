@@ -7,12 +7,16 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    ui->stackedWidget->setCurrentWidget(ui->page_main);
+
+    setupAboutPage();
+
     QIcon icon;
     icon.addFile("://appicon_32.png");
     icon.addFile("://appicon_16.png");
     this->setWindowIcon(icon);
 
-    this->setWindowTitle(QString("%1 %2").arg(this->windowTitle()).arg(APP_VERSION));
+    this->setWindowTitle(QString("%1 %2").arg(APP_NAME).arg(APP_VERSION));
     this->setWindowFlag(Qt::WindowStaysOnTopHint, true);
 
     qApp->installEventFilter(this);
@@ -192,16 +196,48 @@ bool MainWindow::eventFilter(QObject* /*watched*/, QEvent *event)
     return handled;
 }
 
-void MainWindow::quit()
+QFont MainWindow::getMonospaceFont()
 {
-    wantToQuit = true;
-    qApp->quit();
+    QFont font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+    if (!QFontInfo(font).fixedPitch()) {
+        // Try backup method
+        QStringList families({"monospace", "consolas", "courier new", "courier"});
+        foreach (QString family, families) {
+            font.setFamily(family);
+            if (QFontInfo(font).fixedPitch()) { break; }
+        }
+    }
+    return font;
+}
+
+void MainWindow::setupAboutPage()
+{
+    ui->plainTextEdit_about_changelog->setFont(getMonospaceFont());
+
+    QString text = ui->label_about_appname->text();
+    text.replace("%APP_NAME%", APP_NAME);
+    ui->label_about_appname->setText(text);
+
+    text = ui->label_about_appInfo->text();
+    text.replace("%APP_VERSION%", APP_VERSION);
+    text.replace("%APP_YEAR_FROM%", APP_YEAR_FROM);
+    text.replace("%APP_YEAR%", APP_YEAR);
+    text.replace("%QT_VERSION%", QT_VERSION_STR);
+    text.replace("%SETTINGS_PATH%", mSettings.settingsDir());
+    ui->label_about_appInfo->setText(text);
+
+    QString changelog = "Could not load changelog";
+    QFile f("://changelog");
+    if (f.open(QIODevice::ReadOnly)) {
+        changelog = f.readAll();
+    }
+    ui->plainTextEdit_about_changelog->setPlainText(changelog);
 }
 
 void MainWindow::setupTrayIcon()
 {
     trayIcon.setIcon(this->windowIcon());
-    trayIcon.setToolTip("Set Window Title");
+    trayIcon.setToolTip(QString("%1 %2").arg(APP_NAME).arg(APP_VERSION));
     connect(&trayIcon, &QSystemTrayIcon::activated,
             this, [=](QSystemTrayIcon::ActivationReason reason)
     {
@@ -210,10 +246,7 @@ void MainWindow::setupTrayIcon()
     });
 
     QMenu* trayMenu = new QMenu(this);
-    trayMenu->addAction("Quit", this, [=]()
-    {
-        quit();
-    });
+    trayMenu->addAction(ui->action_Quit);
     trayIcon.setContextMenu(trayMenu);
 
     trayIcon.show();
@@ -302,5 +335,25 @@ void MainWindow::on_toolButton_presets_remove_clicked()
             win.preset.reset();
         }
     }
+}
+
+void MainWindow::on_action_Quit_triggered()
+{
+    wantToQuit = true;
+    qApp->quit();
+}
+
+void MainWindow::on_action_About_triggered()
+{
+    if (ui->stackedWidget->currentWidget() != ui->page_about) {
+        ui->stackedWidget->setCurrentWidget(ui->page_about);
+    } else {
+        ui->stackedWidget->setCurrentWidget(ui->page_main);
+    }
+}
+
+void MainWindow::on_pushButton_about_back_clicked()
+{
+    ui->stackedWidget->setCurrentWidget(ui->page_main);
 }
 

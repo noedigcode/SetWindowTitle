@@ -1,5 +1,10 @@
 <RCC>
     <qresource prefix="/">
         <file>setwintitle-crop-selection.png</file>
+        <file alias="remove">PastelSVG-1.2/cross.png</file>
+        <file alias="save">PastelSVG-1.2/disk.png</file>
+        <file alias="exit">PastelSVG-1.2/exit.png</file>
+        <file alias="about">PastelSVG-1.2/information.png</file>
+        <file alias="back">PastelSVG-1.2/arrow-back.png</file>
     </qresource>
 </RCC>

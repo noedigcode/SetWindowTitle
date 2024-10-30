@@ -21,7 +21,8 @@ HEADERS += \
     WindowFunctions.h \
     gidfile.h \
     mainwindow.h \
-    settings.h
+    settings.h \
+    version.h
 
 FORMS += \
     mainwindow.ui
@@ -35,5 +36,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 LIBS += -luser32
 
 RESOURCES += \
-    images/images.qrc
+    images/images.qrc \
+    text.qrc
 

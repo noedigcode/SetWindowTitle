@@ -3,6 +3,7 @@
 
 #include "WindowFunctions.h"
 #include "settings.h"
+#include "version.h"
 
 #include <QBasicTimer>
 #include <QCloseEvent>
@@ -17,7 +18,6 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
-#define APP_VERSION "1.0.2-dev"
 
 class MainWindow : public QMainWindow
 {
@@ -34,24 +34,29 @@ private slots:
     void on_lineEdit_title_selectionChanged();
     void on_lineEdit_title_textChanged(const QString &arg1);
     void on_toolButton_crop_clicked();
-
     void on_lineEdit_regex_textChanged(const QString &arg1);
-
     void on_pushButton_addPreset_clicked();
-
     void on_toolButton_presets_remove_clicked();
+    void on_action_Quit_triggered();
+
+    void on_action_About_triggered();
+
+    void on_pushButton_about_back_clicked();
 
 private:
     Ui::MainWindow *ui;
     void closeEvent(QCloseEvent *event);
     bool eventFilter(QObject *watched, QEvent *event);
 
+    QFont getMonospaceFont();
+
+    void setupAboutPage();
+
     Settings mSettings;
 
     QString mSelectedText;
 
     bool wantToQuit = false;
-    void quit();
 
     QSystemTrayIcon trayIcon {this};
     void setupTrayIcon();

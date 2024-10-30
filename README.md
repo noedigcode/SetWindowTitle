@@ -2,7 +2,7 @@
 Set Window Title
 ================
 
-2023 Gideon van der Kolf
+2023-2024 Gideon van der Kolf
 
 Sets the titles of windows, on Windows.
 

@@ -1,6 +1,15 @@
 Changelog
 =========
 
+[1.0.2] - October 2024
+----------------------
+
+Added
+
+- Presets based on regular expression patterns
+- About page
+
+
 [1.0.1] - July 2024
 -------------------
 
